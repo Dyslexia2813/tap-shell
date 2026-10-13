@@ -44,7 +44,13 @@ jobs:
           gradle-version: "8.7"
 
       - name: Build
-        run: gradle --no-daemon :app:assembleRelease
+        run: |
+          set -o pipefail
+          if ! gradle --no-daemon --console=plain :app:assembleRelease 2>&1 | tee build.log; then
+            msg=$(grep -E "error:|e: |FAILED|What went wrong|Execution failed|Caused by|AAPT|Could not|not found" -A2 build.log | head -40 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Gradle build failed::${msg}"
+            exit 1
+          fi
 
       - name: Name the APK
         run: cp app/build/outputs/apk/release/app-release.apk tap-shell.apk
