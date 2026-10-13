@@ -43,6 +43,8 @@ android {
 }
 
 dependencies {
+    // Выравниваем версии Kotlin stdlib, которые тянут androidx-библиотеки.
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.22"))
     implementation("androidx.activity:activity:1.9.0")
     implementation("androidx.core:core:1.13.1")
 }
