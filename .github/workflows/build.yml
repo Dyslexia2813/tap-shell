@@ -53,12 +53,12 @@ jobs:
           fi
 
       - name: Name the APK
-        run: cp app/build/outputs/apk/release/app-release.apk tap-shell.apk
+        run: cp app/build/outputs/apk/release/app-release.apk deeix-ru.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: tap-shell
-          path: tap-shell.apk
+          name: deeix-ru
+          path: deeix-ru.apk
 
       - name: Publish as the "latest" release
         if: github.ref == 'refs/heads/main'
@@ -66,7 +66,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes --cleanup-tag || true
-          gh release create latest tap-shell.apk \
+          gh release create latest deeix-ru.apk \
             --target "${{ github.sha }}" \
-            --title "Tap-Shell (latest)" \
+            --title "DEEIX-RU (latest)" \
             --notes "Build #${{ github.run_number }}"

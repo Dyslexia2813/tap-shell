@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.RenderProcessGoneDetail;
@@ -199,7 +200,14 @@ public class MainActivity extends ComponentActivity {
                 ? R.drawable.ic_fullscreen_exit : R.drawable.ic_fullscreen);
     }
 
+    @SuppressWarnings("deprecation")
     private void applyBars(boolean hide) {
+        // Старый флаг тоже ставим: на части прошивок он надёжнее скрывает верхнюю панель.
+        if (hide) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
         WindowInsetsControllerCompat c =
                 WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
         c.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
@@ -325,6 +333,7 @@ public class MainActivity extends ComponentActivity {
     protected void onResume() {
         super.onResume();
         web.onResume();
+        applyBars(fullscreen || customView != null);
     }
 
     @Override
