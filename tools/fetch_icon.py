@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Скачивает самую большую иконку сайта (PWA-манифест, apple-touch-icon, favicon).
 
-Использование: fetch_icon.py <куда сохранить .png>
+Использование: fetch_icon.py <адрес сайта> <куда сохранить .png>
 Код выхода 1, если подходящей иконки не нашлось.
 """
 import io
@@ -13,7 +13,7 @@ from html.parser import HTMLParser
 
 from PIL import Image
 
-SITE = "https://tap.teamdream.online/"
+SITE = ""
 UA = ("Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36")
 
@@ -97,9 +97,11 @@ def collect_candidates():
 
 
 def main():
-    if len(sys.argv) != 2:
+    global SITE
+    if len(sys.argv) != 3:
         print(__doc__)
         return 2
+    SITE = sys.argv[1]
     best, best_url = None, None
     for url in collect_candidates():
         try:
@@ -116,10 +118,10 @@ def main():
     if best is None:
         print("No usable icon found")
         return 1
-    best.convert("RGBA").save(sys.argv[1], "PNG")
+    best.convert("RGBA").save(sys.argv[2], "PNG")
     print(f"Chosen: {best_url} ({best.size[0]}x{best.size[1]})")
     if min(best.size) < 192:
-        print("::warning::Site icon is small; put a 512x512 icon.png in the repo root for a sharper icon")
+        print("::warning::Site icon is small; put a 512x512 PNG into icons/ for a sharper icon")
     return 0
 
 

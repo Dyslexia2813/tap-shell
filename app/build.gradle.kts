@@ -14,6 +14,35 @@ android {
         versionName = "1.0"
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
+    // Один код, два приложения. Для нового сайта добавьте ещё один flavor.
+    // ALLOWED_HOSTS: домены (вместе с поддоменами), которые открываются внутри приложения.
+    // OPEN_OTHERS_IN_BROWSER: остальные ссылки открывать в браузере (true) или блокировать (false).
+    flavorDimensions += "site"
+    productFlavors {
+        create("deeix") {
+            dimension = "site"
+            applicationId = "online.teamdream.tap_shell"
+            resValue("string", "app_name", "DEEIX-RU")
+            buildConfigField("String", "HOME", "\"https://tap.teamdream.online/\"")
+            buildConfigField("String", "ALLOWED_HOSTS", "\"tap.teamdream.online\"")
+            buildConfigField("boolean", "OPEN_OTHERS_IN_BROWSER", "false")
+        }
+        create("allhands") {
+            dimension = "site"
+            applicationId = "dev.allhands.app_shell"
+            resValue("string", "app_name", "OpenHands")
+            buildConfigField("String", "HOME", "\"https://app.all-hands.dev/\"")
+            // Вход идёт через auth.app.all-hands.dev и GitHub / GitLab / Bitbucket.
+            buildConfigField("String", "ALLOWED_HOSTS",
+                "\"all-hands.dev,openhands.dev,github.com,gitlab.com,bitbucket.org,id.atlassian.com\"")
+            buildConfigField("boolean", "OPEN_OTHERS_IN_BROWSER", "true")
+        }
+    }
+
     // Фиксированный ключ подписи, чтобы новые сборки ставились поверх старых.
     signingConfigs {
         getByName("debug") {

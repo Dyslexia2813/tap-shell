@@ -2,7 +2,6 @@ name: Build APK
 
 on:
   push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -26,18 +25,23 @@ jobs:
       - name: Install Pillow
         run: pip install pillow
 
-      - name: Get site icon
+      # Иконка: icons/<flavor>.png из репозитория, иначе скачивается с сайта.
+      - name: Generate launcher icons
         run: |
           mkdir -p build
-          if [ -f icon.png ]; then
-            cp icon.png build/site-icon.png
-            echo "Using icon.png from the repo"
-          else
-            python tools/fetch_icon.py build/site-icon.png || echo "::warning::Could not download the site icon"
-          fi
-
-      - name: Generate launcher icons
-        run: python tools/make_icons.py build/site-icon.png app/src/main/res
+          while read flavor site; do
+            icon="build/$flavor-icon.png"
+            if [ -f "icons/$flavor.png" ]; then
+              cp "icons/$flavor.png" "$icon"
+              echo "$flavor: using icons/$flavor.png"
+            else
+              python tools/fetch_icon.py "$site" "$icon" || echo "::warning::$flavor: could not download the site icon"
+            fi
+            python tools/make_icons.py "$icon" "app/src/$flavor/res"
+          done <<'LIST'
+          deeix https://tap.teamdream.online/
+          allhands https://app.all-hands.dev/
+          LIST
 
       - uses: gradle/actions/setup-gradle@v4
         with:
@@ -52,13 +56,17 @@ jobs:
             exit 1
           fi
 
-      - name: Name the APK
-        run: cp app/build/outputs/apk/release/app-release.apk deeix-ru.apk
+      - name: Name the APKs
+        run: |
+          cp app/build/outputs/apk/deeix/release/app-deeix-release.apk deeix-ru.apk
+          cp app/build/outputs/apk/allhands/release/app-allhands-release.apk openhands.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: deeix-ru
-          path: deeix-ru.apk
+          name: apks
+          path: |
+            deeix-ru.apk
+            openhands.apk
 
       - name: Publish as the "latest" release
         if: github.ref == 'refs/heads/main'
@@ -66,7 +74,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes --cleanup-tag || true
-          gh release create latest deeix-ru.apk \
+          gh release create latest deeix-ru.apk openhands.apk \
             --target "${{ github.sha }}" \
-            --title "DEEIX-RU (latest)" \
-            --notes "Build #${{ github.run_number }}"
+            --title "Web wrappers (latest)" \
+            --notes "Build #${{ github.run_number }}: DEEIX-RU (tap.teamdream.online) and OpenHands (app.all-hands.dev)"

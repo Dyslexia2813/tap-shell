@@ -43,8 +43,8 @@ import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends ComponentActivity {
 
-    private static final String HOME = "https://tap.teamdream.online/";
-    private static final String HOST = "tap.teamdream.online";
+    private static final String HOME = BuildConfig.HOME;
+    private static final String[] HOSTS = BuildConfig.ALLOWED_HOSTS.split(",");
     private static final String PREFS = "tap_shell";
     private static final String KEY_FULLSCREEN = "fullscreen";
 
@@ -119,14 +119,22 @@ public class MainActivity extends ComponentActivity {
 
         CookieManager cookies = CookieManager.getInstance();
         cookies.setAcceptCookie(true);
+        // Нужно для входа, когда страница входа живёт на соседнем поддомене.
+        cookies.setAcceptThirdPartyCookies(web, true);
 
         web.addJavascriptInterface(new Bridge(), "TapShell");
 
         web.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                // true = не загружать. Пускаем только tap.teamdream.online по https.
-                return !isAllowed(request.getUrl());
+                // true = не загружать здесь. Внутри открываем только разрешённые сайты по https.
+                Uri uri = request.getUrl();
+                if (isAllowed(uri)) return false;
+                if (BuildConfig.OPEN_OTHERS_IN_BROWSER && request.isForMainFrame()
+                        && request.hasGesture()) {
+                    openExternally(uri);
+                }
+                return true;
             }
 
             @Override
@@ -189,7 +197,23 @@ public class MainActivity extends ComponentActivity {
     }
 
     private static boolean isAllowed(Uri uri) {
-        return "https".equals(uri.getScheme()) && HOST.equalsIgnoreCase(uri.getHost());
+        String host = uri.getHost();
+        if (!"https".equals(uri.getScheme()) || host == null) return false;
+        host = host.toLowerCase();
+        for (String h : HOSTS) {
+            if (host.equals(h) || host.endsWith("." + h)) return true;
+        }
+        return false;
+    }
+
+    private void openExternally(Uri uri) {
+        String scheme = uri.getScheme();
+        if (!"https".equals(scheme) && !"http".equals(scheme) && !"mailto".equals(scheme)) return;
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } catch (ActivityNotFoundException e) {
+            toast("Нет приложения, чтобы открыть ссылку");
+        }
     }
 
     // ---- Полный экран ----
@@ -301,7 +325,7 @@ public class MainActivity extends ComponentActivity {
         runOnUiThread(() -> Toast.makeText(this, text, Toast.LENGTH_SHORT).show());
     }
 
-    /** Доступен только странице tap.teamdream.online (другие адреса блокируются). */
+    /** Доступен только разрешённым сайтам (другие адреса в WebView не открываются). */
     private class Bridge {
         @JavascriptInterface
         public void saveDataUrl(String dataUrl, String name) {

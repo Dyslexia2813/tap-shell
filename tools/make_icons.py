@@ -17,7 +17,7 @@ SAFE_ZONE = 0.66  # картинка занимает 66% слоя, чтобы �
 
 def placeholder():
     print("::warning::Site icon not found, using a placeholder icon. "
-          "Add icon.png (512x512) to the repo root.")
+          "Add a 512x512 PNG to icons/.")
     img = Image.new("RGBA", (512, 512), THEME_BG + (255,))
     d = ImageDraw.Draw(img)
     d.rectangle([116, 116, 396, 190], fill=(255, 255, 255, 255))

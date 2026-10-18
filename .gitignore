@@ -4,3 +4,6 @@ local.properties
 .idea/
 *.iml
 .DS_Store
+# иконки генерируются при сборке
+app/src/*/res/mipmap-*dpi/
+app/src/*/res/values/icon_colors.xml
