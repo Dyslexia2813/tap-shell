@@ -51,6 +51,7 @@ public class MainActivity extends ComponentActivity {
     private FrameLayout root;
     private WebView web;
     private ImageButton fsButton;
+    private ImageButton reloadButton;
 
     /** Режим «без системных панелей», который включает кнопка. По умолчанию включён. */
     private boolean fullscreen;
@@ -76,6 +77,7 @@ public class MainActivity extends ComponentActivity {
         root = findViewById(R.id.root);
         web = findViewById(R.id.web);
         fsButton = findViewById(R.id.fs_button);
+        reloadButton = findViewById(R.id.reload_button);
 
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         fullscreen = prefs.getBoolean(KEY_FULLSCREEN, true);
@@ -88,6 +90,8 @@ public class MainActivity extends ComponentActivity {
             applyFullscreen();
         });
         applyFullscreen();
+
+        reloadButton.setOnClickListener(v -> web.reload());
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -167,6 +171,7 @@ public class MainActivity extends ComponentActivity {
                 root.addView(view, new FrameLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 fsButton.setVisibility(View.GONE);
+                reloadButton.setVisibility(View.GONE);
                 applyBars(true);
             }
 
@@ -227,6 +232,7 @@ public class MainActivity extends ComponentActivity {
             customViewCallback = null;
         }
         fsButton.setVisibility(View.VISIBLE);
+        reloadButton.setVisibility(View.VISIBLE);
         applyFullscreen();
     }
 

@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">DEEIX-RU</string>
     <string name="fullscreen">Полный экран</string>
+    <string name="reload">Обновить страницу</string>
 </resources>
