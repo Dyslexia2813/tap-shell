@@ -53,12 +53,16 @@ jobs:
           fi
 
       - name: Name the APK
-        run: cp app/build/outputs/apk/release/app-release.apk deeix-ru.apk
+        run: |
+          ver=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' app/build.gradle.kts)
+          test -n "$ver"
+          echo "VERSION=$ver" >> "$GITHUB_ENV"
+          cp app/build/outputs/apk/release/app-release.apk "deeix-ru-$ver.apk"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: deeix-ru
-          path: deeix-ru.apk
+          name: deeix-ru-${{ env.VERSION }}
+          path: deeix-ru-${{ env.VERSION }}.apk
 
       - name: Publish as the "latest" release
         if: github.ref == 'refs/heads/main'
@@ -66,7 +70,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes --cleanup-tag || true
-          gh release create latest deeix-ru.apk \
+          gh release create latest "deeix-ru-$VERSION.apk" \
             --target "${{ github.sha }}" \
-            --title "DEEIX-RU (latest)" \
-            --notes "Build #${{ github.run_number }}"
+            --title "DEEIX-RU $VERSION" \
+            --notes "Версия $VERSION, сборка #${{ github.run_number }}"
