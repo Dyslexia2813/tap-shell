@@ -11,7 +11,7 @@ android {
         minSdk = 29
         targetSdk = 34
         versionCode = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
-        versionName = "1.0"
+        versionName = "1.1"
     }
 
     // Фиксированный ключ подписи, чтобы новые сборки ставились поверх старых.
