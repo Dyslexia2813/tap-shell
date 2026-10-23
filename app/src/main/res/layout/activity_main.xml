@@ -12,6 +12,7 @@
 
     <!-- Кнопки в ряд вверху по центру, чтобы не закрывать элементы страницы по краям. -->
     <LinearLayout
+        android:id="@+id/buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
