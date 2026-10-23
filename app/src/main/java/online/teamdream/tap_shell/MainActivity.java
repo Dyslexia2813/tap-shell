@@ -25,7 +25,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
@@ -55,7 +54,6 @@ public class MainActivity extends ComponentActivity {
     private WebView web;
     private ImageButton fsButton;
     private ImageButton reloadButton;
-    private LinearLayout buttons;
 
     /** Режим «без системных панелей», который включает кнопка. По умолчанию включён. */
     private boolean fullscreen;
@@ -85,24 +83,15 @@ public class MainActivity extends ComponentActivity {
         web = findViewById(R.id.web);
         fsButton = findViewById(R.id.fs_button);
         reloadButton = findViewById(R.id.reload_button);
-        buttons = findViewById(R.id.buttons);
 
         // Отступы под панели и вырез камеры считаем сами: в полном экране страница
         // занимает весь экран, включая полосу у камеры.
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
-            Insets cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout());
             Insets bars = barsHidden ? Insets.NONE : insets.getInsets(
                     WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
             v.setPadding(bars.left, bars.top, bars.right, Math.max(bars.bottom, ime.bottom));
-            // Кнопки опускаем ниже камеры, чтобы она их не закрывала.
-            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) buttons.getLayoutParams();
-            int top = (barsHidden ? cutout.top : 0) + dp(4);
-            if (lp.topMargin != top) {
-                lp.topMargin = top;
-                buttons.setLayoutParams(lp);
-            }
             return WindowInsetsCompat.CONSUMED;
         });
 
@@ -250,10 +239,6 @@ public class MainActivity extends ComponentActivity {
         } else {
             c.show(WindowInsetsCompat.Type.systemBars());
         }
-    }
-
-    private int dp(int value) {
-        return Math.round(value * getResources().getDisplayMetrics().density);
     }
 
     private void hideCustomView() {
