@@ -10,20 +10,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Кнопки в ряд вверху по центру, чтобы не закрывать элементы страницы по краям. -->
+    <!-- Кнопки по бокам от логотипа DEEIX в шапке сайта: «Обновить» слева, «Полный экран» справа. -->
     <LinearLayout
         android:id="@+id/buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="6dp"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/reload_button"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="84dp"
             android:alpha="0.55"
             android:background="@drawable/fs_button_bg"
             android:contentDescription="@string/reload"
